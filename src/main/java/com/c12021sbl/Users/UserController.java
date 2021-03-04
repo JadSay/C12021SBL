@@ -39,7 +39,7 @@ class UserController {
   User one(@PathVariable String id) {
     
     return repository.findById(id)
-      .orElseThrow(() -> new RuntimeException("User not found - " + id));
+      .orElseThrow(() -> new UserNotFoundException(id));
   }
 
   @PutMapping("/users/{id}")
@@ -52,14 +52,12 @@ class UserController {
         User.setAge(newUser.getAge());
         return repository.save(User);
       })
-      .orElseGet(() -> {
-        newUser.setId(id);
-        return repository.save(newUser);
-      });
+      .orElseThrow(() -> new UserNotFoundException(id));
   }
 
   @DeleteMapping("/users/{id}")
-  void deleteUser(@PathVariable String id) {
+  String deleteUser(@PathVariable String id) {
     repository.deleteById(id);
+    return "Deleted user with id: " + id;
   }
 }
